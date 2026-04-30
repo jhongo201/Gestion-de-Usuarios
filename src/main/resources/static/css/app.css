@@ -1,0 +1,128 @@
+/* ── Paleta IDIGER ───────────────────────────────────────────────────────── */
+:root {
+    --idiger-primary:   #1B3A5C;
+    --idiger-secondary: #2E75B6;
+    --idiger-accent:    #F0A500;
+    --sidebar-width:    260px;
+    --navbar-height:    56px;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+.idiger-navbar {
+    background-color: var(--idiger-primary);
+    height: var(--navbar-height);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1040;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.idiger-sidebar {
+    background-color: #152d47;
+    width: var(--sidebar-width);
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    bottom: 0;
+    z-index: 1030;
+    overflow-y: auto;
+    transition: transform .25s ease;
+}
+
+.sidebar-link {
+    color: #b0c4d8;
+    border-radius: 6px;
+    padding: .5rem .75rem;
+    font-size: .9rem;
+    transition: background .15s, color .15s;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-link:hover {
+    background-color: rgba(255,255,255,.08);
+    color: #fff;
+}
+
+.sidebar-link.active {
+    background-color: var(--idiger-secondary);
+    color: #fff;
+}
+
+.sidebar-section-title {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #6c8ba8;
+    font-weight: 600;
+}
+
+/* ── Contenido principal ─────────────────────────────────────────────────── */
+.main-content {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--navbar-height);
+    min-height: calc(100vh - var(--navbar-height));
+    background-color: #f4f7fb;
+    padding: 1.5rem;
+}
+
+/* ── Cards de estadísticas ───────────────────────────────────────────────── */
+.stat-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    transition: transform .2s;
+}
+
+.stat-card:hover { transform: translateY(-3px); }
+
+.stat-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+}
+
+/* ── Tablas ──────────────────────────────────────────────────────────────── */
+.table-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: var(--idiger-primary);
+    color: white;
+    font-weight: 500;
+    font-size: .85rem;
+    border: none;
+}
+
+.table tbody tr:hover { background-color: #eef3fb; }
+
+/* ── Badge estado ────────────────────────────────────────────────────────── */
+.badge-activo   { background-color: #d4edda; color: #155724; }
+.badge-inactivo { background-color: #f8d7da; color: #721c24; }
+
+/* ── Página de login ─────────────────────────────────────────────────────── */
+.login-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--idiger-primary) 0%,
+                                        var(--idiger-secondary) 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+
+.login-card {
+    width: 100%; max-width: 420px;
+    border: none; border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+
+/* ── Responsivo ──────────────────────────────────────────────────────────── */
+@media (max-width: 991px) {
+    .idiger-sidebar { transform: translateX(-100%); }
+    .idiger-sidebar.show { transform: translateX(0); }
+    .main-content { margin-left: 0; }
+}

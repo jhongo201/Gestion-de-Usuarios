@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="navbar" class="navbar navbar-dark idiger-navbar px-3">
+    <!-- Botón toggle sidebar en móvil -->
+    <button class="btn btn-link text-white me-3 d-lg-none"
+            id="sidebarToggle" type="button">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+
+    <!-- Logo + nombre sistema -->
+    <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/dashboard}">
+        <i class="bi bi-shield-lock-fill fs-5"></i>
+        <span class="fw-bold">Reportes Contractuales</span>
+    </a>
+
+    <!-- Spacer -->
+    <div class="flex-grow-1"></div>
+
+    <!-- Usuario autenticado -->
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-white-50 small d-none d-md-inline"
+              sec:authentication="principal.nombreEntidad">Entidad</span>
+        <div class="dropdown">
+            <button class="btn btn-link text-white dropdown-toggle p-0"
+                    type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle fs-5 me-1"></i>
+                <span sec:authentication="principal.nombreCompleto">Usuario</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <span class="dropdown-item-text small text-muted"
+                          sec:authentication="name">username</span>
+                </li>
+                <li>
+                    <span class="dropdown-item-text small text-muted"
+                          sec:authentication="principal.nombreRol">rol</span>
+                </li>
+                <li><hr class="dropdown-divider"/></li>
+                <li>
+                    <form th:action="@{/logout}" method="post">
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
