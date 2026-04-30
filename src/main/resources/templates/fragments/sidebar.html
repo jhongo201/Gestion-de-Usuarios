@@ -2,80 +2,77 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
-<nav th:fragment="sidebar" class="idiger-sidebar d-flex flex-column"
-     id="sidebar">
+<nav th:fragment="sidebar" class="idiger-sidebar" id="sidebar">
+
     <!-- Encabezado sidebar -->
-    <div class="sidebar-header p-3 border-bottom border-secondary">
-        <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-building text-warning fs-5"></i>
+    <div class="sidebar-header">
+        <div style="display:flex;align-items:center;gap:.5rem">
+            <i class="bi bi-building" style="color:#3D682C;font-size:1.1rem"></i>
             <div>
-                <div class="text-white fw-bold small">IDIGER</div>
-                <div class="text-white-50" style="font-size:0.7rem">
-                    Módulo de Seguridad
-                </div>
+                <div style="color:#3D682C;font-weight:700;font-size:.88rem">IDIGER</div>
+                <div style="color:#6a8a5a;font-size:.7rem">Módulo de Seguridad</div>
             </div>
         </div>
     </div>
 
     <!-- Menú -->
-    <ul class="nav flex-column p-2 flex-grow-1">
+    <ul style="list-style:none;padding:.5rem;margin:0;flex:1">
 
         <!-- Dashboard -->
-        <li class="nav-item">
-            <a class="nav-link sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI == '/rcontractual/dashboard'} ? 'active'"
+        <li>
+            <a class="sidebar-link"
+               th:classappend="${#httpServletRequest.requestURI == '/rcontractual/dashboard'} ? ' active'"
                th:href="@{/dashboard}">
-                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                <i class="bi bi-speedometer2"></i>Dashboard
             </a>
         </li>
 
-        <!-- Módulo Seguridad -->
-        <li class="nav-item mt-2">
-            <span class="sidebar-section-title px-2">SEGURIDAD</span>
-        </li>
+        <!-- Sección Seguridad -->
+        <li><span class="sidebar-section-title">SEGURIDAD</span></li>
 
-        <li class="nav-item" sec:authorize="hasAuthority('RC_ADMIN')">
-            <a class="nav-link sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/usuarios')} ? 'active'"
+        <li sec:authorize="hasAuthority('RC_ADMIN')">
+            <a class="sidebar-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/usuarios')} ? ' active'"
                th:href="@{/seguridad/usuarios}">
-                <i class="bi bi-people me-2"></i>Usuarios
+                <i class="bi bi-people"></i>Usuarios
             </a>
         </li>
 
-        <li class="nav-item" sec:authorize="hasAuthority('RC_ADMIN')">
-            <a class="nav-link sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/roles')} ? 'active'"
+        <li sec:authorize="hasAuthority('RC_ADMIN')">
+            <a class="sidebar-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/roles')} ? ' active'"
                th:href="@{/seguridad/roles}">
-                <i class="bi bi-person-badge me-2"></i>Roles
+                <i class="bi bi-person-badge"></i>Roles
             </a>
         </li>
 
-        <li class="nav-item" sec:authorize="hasAuthority('RC_ADMIN')">
-            <a class="nav-link sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/permisos')} ? 'active'"
+        <li sec:authorize="hasAuthority('RC_ADMIN')">
+            <a class="sidebar-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/permisos')} ? ' active'"
                th:href="@{/seguridad/permisos}">
-                <i class="bi bi-key me-2"></i>Permisos
+                <i class="bi bi-key"></i>Permisos
             </a>
         </li>
 
-        <!-- Módulo Reportes -->
-        <li class="nav-item mt-2">
-            <span class="sidebar-section-title px-2">REPORTES</span>
-        </li>
+        <!-- Sección Reportes -->
+        <li><span class="sidebar-section-title">REPORTES</span></li>
 
-        <li class="nav-item" sec:authorize="hasAuthority('RC_LISTAR')">
-            <a class="nav-link sidebar-link" href="#">
-                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+        <li sec:authorize="hasAuthority('RC_LISTAR')">
+            <a class="sidebar-link" href="#">
+                <i class="bi bi-file-earmark-bar-graph"></i>
                 Reportes Contractuales
-                <span class="badge bg-warning text-dark ms-auto small">Próximo</span>
+                <span style="margin-left:auto;background:#F0A500;color:#fff;
+                             font-size:.63rem;padding:.1rem .4rem;border-radius:2px">
+                    Próximo
+                </span>
             </a>
         </li>
+
     </ul>
 
-    <!-- Footer sidebar -->
-    <div class="p-3 border-top border-secondary">
-        <small class="text-white-50">v1.0.0 — 2026</small>
-    </div>
+    <!-- Footer -->
+    <div>v1.0.0 — 2026</div>
+
 </nav>
 </body>
 </html>
