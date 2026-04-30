@@ -1,6 +1,9 @@
 package gov.idiger.rcontractual.config;
 
 import gov.idiger.rcontractual.security.RcontractualUserDetailsService;
+import gov.idiger.rcontractual.security.RecaptchaLoginFilter;
+import gov.idiger.rcontractual.security.RecaptchaService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +35,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final RcontractualUserDetailsService userDetailsService;
 
+    /* Inyección del servicio de validación reCAPTCHA */
+    private final RecaptchaService recaptchaService;
+
     /**
      * Constructor — disableDefaults=true desactiva el registro
      * automático de filtros y providers de Spring Boot Security,
@@ -40,10 +46,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param userDetailsService servicio de autenticación contra Oracle
      */
     public SecurityConfig(
-            RcontractualUserDetailsService userDetailsService) {
+            RcontractualUserDetailsService userDetailsService,
+        RecaptchaService recaptchaService) {
         /* disableDefaults=true es la clave — evita el provider automático */
         //super(true);
         this.userDetailsService = userDetailsService;
+        this.recaptchaService = recaptchaService;
+    }
+
+    /**
+     * Bean del filtro de reCAPTCHA.
+     *
+     * @return filtro configurado con el servicio de validación
+     */
+    @Bean
+    public RecaptchaLoginFilter recaptchaLoginFilter() {
+        return new RecaptchaLoginFilter(recaptchaService);
     }
 
     /**
@@ -120,6 +138,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             .and()
+            .addFilterBefore(
+        recaptchaLoginFilter(),
+        org.springframework.security.web.authentication
+            .UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
                 .antMatchers(
                     "/login", "/login/**",

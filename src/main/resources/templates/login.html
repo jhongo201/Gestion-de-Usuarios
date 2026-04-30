@@ -159,6 +159,7 @@
             .logo-container img { max-width: 240px; }
         }
     </style>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 
@@ -234,6 +235,18 @@
                     </div>
                 </div>
 
+                <!-- Alerta captcha inválido -->
+                <div th:if="${param.captcha}"
+                    class="alert alert-danger d-flex align-items-center gap-2"
+                    role="alert">
+                    <i class="bi bi-shield-x-fill"></i>
+                    <span>Por favor confirma que no eres un robot.</span>
+                </div>
+
+                <!-- reCAPTCHA widget -->
+                <div class="g-recaptcha"
+     th:attr="data-sitekey=${recaptchaSiteKey}">
+</div>
                 <button type="submit" class="btn-ingresar">
                     Ingresar
                 </button>
