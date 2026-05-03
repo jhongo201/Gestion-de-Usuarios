@@ -2,61 +2,75 @@ package gov.idiger.rcontractual.controller;
 
 import gov.idiger.rcontractual.dto.UsuarioDTO;
 import gov.idiger.rcontractual.dto.UsuarioRequestDTO;
+import gov.idiger.rcontractual.security.UsuarioSesionVO;
 import gov.idiger.rcontractual.service.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 /**
- * Controlador REST para la gestión de usuarios.
- * Expone el CRUD bajo /api/usuarios.
- * Todos los endpoints requieren RC_ADMIN.
+ * Controlador REST para la gestion administrativa de usuarios.
  *
- * @author IDIGER – Equipo de Desarrollo
+ * Todos los endpoints requieren authority RC_ADMIN.
  */
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     private static final Logger log =
-        LoggerFactory.getLogger(UsuarioController.class);
+            LoggerFactory.getLogger(UsuarioController.class);
 
     private final UsuarioService usuarioService;
 
-    /**
-     * Constructor para inyección de dependencias.
-     *
-     * @param usuarioService servicio de gestión de usuarios
-     */
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
     /**
-     * Lista todos los usuarios activos del sistema.
-     * GET /api/usuarios
+     * Lista usuarios.
      *
-     * @return HTTP 200 con lista de usuarios activos
+     * Si no se envia estado, retorna todos.
+     * Si se envia estado, filtra:
+     * 0 = Inactivo, 1 = Activo, 2 = Pendiente.
+     *
+     * Ejemplos:
+     * GET /api/usuarios
+     * GET /api/usuarios?estado=2
      */
     @GetMapping
     @PreAuthorize("hasAuthority('RC_ADMIN')")
-    public ResponseEntity<List<UsuarioDTO>> listarActivos() {
-        log.debug("GET /api/usuarios");
-        return ResponseEntity.ok(usuarioService.listarActivos());
+    public ResponseEntity<List<UsuarioDTO>> listar(
+            @RequestParam(required = false) Integer estado) {
+        log.debug("GET /api/usuarios estado={}", estado);
+
+        if (estado == null) {
+            return ResponseEntity.ok(usuarioService.listarTodos());
+        }
+
+        return ResponseEntity.ok(usuarioService.listarPorEstado(estado));
     }
 
     /**
-     * Lista los usuarios activos de una entidad específica.
+     * Cuenta usuarios pendientes de aprobacion.
+     * GET /api/usuarios/pendientes/count
+     */
+    @GetMapping("/pendientes/count")
+    @PreAuthorize("hasAuthority('RC_ADMIN')")
+    public ResponseEntity<Long> contarPendientes() {
+        log.debug("GET /api/usuarios/pendientes/count");
+        return ResponseEntity.ok(usuarioService.contarPendientes());
+    }
+
+    /**
+     * Lista usuarios de una entidad.
      * GET /api/usuarios/entidad/{idEntidad}
-     *
-     * @param idEntidad ID de la entidad a filtrar
-     * @return HTTP 200 con lista de usuarios de esa entidad
      */
     @GetMapping("/entidad/{idEntidad}")
     @PreAuthorize("hasAuthority('RC_ADMIN')")
@@ -67,11 +81,8 @@ public class UsuarioController {
     }
 
     /**
-     * Busca un usuario por su ID.
+     * Busca un usuario por ID.
      * GET /api/usuarios/{idUsuario}
-     *
-     * @param idUsuario ID del usuario
-     * @return HTTP 200 con el usuario encontrado
      */
     @GetMapping("/{idUsuario}")
     @PreAuthorize("hasAuthority('RC_ADMIN')")
@@ -82,11 +93,8 @@ public class UsuarioController {
     }
 
     /**
-     * Crea un nuevo usuario.
+     * Crea un usuario desde el modulo administrativo.
      * POST /api/usuarios
-     *
-     * @param request DTO con los datos del nuevo usuario
-     * @return HTTP 201 con el usuario creado
      */
     @PostMapping
     @PreAuthorize("hasAuthority('RC_ADMIN')")
@@ -99,12 +107,8 @@ public class UsuarioController {
     }
 
     /**
-     * Actualiza los datos de un usuario existente.
+     * Actualiza un usuario existente.
      * PUT /api/usuarios/{idUsuario}
-     *
-     * @param idUsuario ID del usuario a actualizar
-     * @param request   DTO con los nuevos datos
-     * @return HTTP 200 con el usuario actualizado
      */
     @PutMapping("/{idUsuario}")
     @PreAuthorize("hasAuthority('RC_ADMIN')")
@@ -116,11 +120,22 @@ public class UsuarioController {
     }
 
     /**
-     * Desactiva un usuario (ESTADO_USUARIO = 0).
+     * Activa un usuario pendiente o inactivo.
+     * PATCH /api/usuarios/{idUsuario}/activar
+     */
+    @PatchMapping("/{idUsuario}/activar")
+    @PreAuthorize("hasAuthority('RC_ADMIN')")
+    public ResponseEntity<UsuarioDTO> activar(
+            @PathVariable Long idUsuario,
+            @AuthenticationPrincipal UsuarioSesionVO admin) {
+        log.info("PATCH /api/usuarios/{}/activar", idUsuario);
+        return ResponseEntity.ok(
+                usuarioService.activar(idUsuario, admin.getIdUsuario()));
+    }
+
+    /**
+     * Desactiva un usuario.
      * DELETE /api/usuarios/{idUsuario}
-     *
-     * @param idUsuario ID del usuario a desactivar
-     * @return HTTP 204 sin contenido
      */
     @DeleteMapping("/{idUsuario}")
     @PreAuthorize("hasAuthority('RC_ADMIN')")

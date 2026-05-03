@@ -5,10 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.servlet.http.HttpSession;
+
 /**
- * Controlador MVC para la página de login.
- *
- * @author IDIGER – Equipo de Desarrollo
+ * Controlador MVC para la pagina de login.
  */
 @Controller
 public class LoginController {
@@ -17,18 +17,26 @@ public class LoginController {
     private String recaptchaSiteKey;
 
     /**
-     * Muestra la página de login.
-     * GET /login
+     * Muestra la pagina de login.
+     *
+     * Si Spring Security dejo un mensaje de error en sesion, lo pasa
+     * a la vista y luego lo elimina para que no quede pegado.
      */
     @GetMapping("/login")
-    public String login(Model model) {
-    model.addAttribute("recaptchaSiteKey", recaptchaSiteKey);
-    return "login";
-}
+    public String login(Model model, HttpSession session) {
+        Object loginError = session.getAttribute("LOGIN_ERROR");
+
+        if (loginError != null) {
+            model.addAttribute("loginError", loginError.toString());
+            session.removeAttribute("LOGIN_ERROR");
+        }
+
+        model.addAttribute("recaptchaSiteKey", recaptchaSiteKey);
+        return "login";
+    }
 
     /**
-     * Redirige la raíz al dashboard.
-     * GET /
+     * Redirige la raiz al dashboard.
      */
     @GetMapping("/")
     public String index() {

@@ -1,18 +1,18 @@
 package gov.idiger.rcontractual.controller.mvc;
 
 import gov.idiger.rcontractual.security.UsuarioSesionVO;
+import gov.idiger.rcontractual.service.PermisoService;
 import gov.idiger.rcontractual.service.RolService;
 import gov.idiger.rcontractual.service.UsuarioService;
-import gov.idiger.rcontractual.service.PermisoService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Controlador MVC para el dashboard principal.
+ * Controlador MVC para las vistas principales del sistema.
  *
- * @author IDIGER – Equipo de Desarrollo
+ * Carga dashboard y pantallas del modulo de seguridad.
  */
 @Controller
 public class DashboardController {
@@ -21,19 +21,16 @@ public class DashboardController {
     private final RolService rolService;
     private final PermisoService permisoService;
 
-    /**
-     * Constructor para inyección de dependencias.
-     */
     public DashboardController(UsuarioService usuarioService,
-                                RolService rolService,
-                                PermisoService permisoService) {
-        this.usuarioService  = usuarioService;
-        this.rolService      = rolService;
-        this.permisoService  = permisoService;
+                               RolService rolService,
+                               PermisoService permisoService) {
+        this.usuarioService = usuarioService;
+        this.rolService = rolService;
+        this.permisoService = permisoService;
     }
 
     /**
-     * Muestra el dashboard con estadísticas del módulo.
+     * Dashboard principal.
      * GET /dashboard
      */
     @GetMapping("/dashboard")
@@ -45,22 +42,34 @@ public class DashboardController {
                 rolService.listarTodos().size());
         model.addAttribute("totalPermisos",
                 permisoService.listarPlano().size());
+        model.addAttribute("usuariosPendientes",
+                usuarioService.contarPendientes());
         model.addAttribute("usuario", usuario);
         return "dashboard";
     }
 
-    /** GET /seguridad/usuarios */
+    /**
+     * Administracion de usuarios.
+     * Ahora carga todos los usuarios, no solo activos, para que ADMIN_RC
+     * pueda ver activos, inactivos y pendientes de aprobacion.
+     */
     @GetMapping("/seguridad/usuarios")
     public String usuarios(Model model,
             @AuthenticationPrincipal UsuarioSesionVO usuario) {
         model.addAttribute("usuarios",
-                usuarioService.listarActivos());
-        model.addAttribute("roles", rolService.listarTodos());
+                usuarioService.listarTodos());
+        model.addAttribute("roles",
+                rolService.listarTodos());
+        model.addAttribute("usuariosPendientes",
+                usuarioService.contarPendientes());
         model.addAttribute("usuario", usuario);
         return "seguridad/usuarios";
     }
 
-    /** GET /seguridad/roles */
+    /**
+     * Administracion de roles.
+     * GET /seguridad/roles
+     */
     @GetMapping("/seguridad/roles")
     public String roles(Model model,
             @AuthenticationPrincipal UsuarioSesionVO usuario) {
@@ -69,7 +78,10 @@ public class DashboardController {
         return "seguridad/roles";
     }
 
-    /** GET /seguridad/permisos */
+    /**
+     * Administracion de permisos.
+     * GET /seguridad/permisos
+     */
     @GetMapping("/seguridad/permisos")
     public String permisos(Model model,
             @AuthenticationPrincipal UsuarioSesionVO usuario) {

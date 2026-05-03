@@ -4,89 +4,213 @@ import java.time.OffsetDateTime;
 
 /**
  * DTO de respuesta para la consulta de usuarios.
- * No expone la clave ni datos sensibles internos.
  *
- * @author IDIGER – Equipo de Desarrollo
+ * No expone la clave. Incluye campos nuevos para administrar estados,
+ * solicitudes pendientes y cambio obligatorio de contraseña.
  */
 public class UsuarioDTO {
 
-    /** ID único del usuario */
     private Long idUsuario;
-
-    /** Login del usuario */
     private String username;
 
-    /** Estado: 1 = activo, 0 = inactivo */
+    /** 0 = Inactivo, 1 = Activo, 2 = Pendiente. */
     private Integer estadoUsuario;
+    private String nombreEstadoUsuario;
 
-    /** ID del rol asignado */
     private Long idRol;
-
-    /** Nombre del rol asignado */
     private String nombreRol;
 
-    /** ID de la entidad a la que pertenece */
     private Long idEntidad;
-
-    /** Nombre de la entidad */
     private String nombreEntidad;
 
-    /** Nombre del usuario */
     private String nombreUsuario;
-
-    /** Apellido del usuario */
     private String apellidoUsuario;
 
-    /** Número de documento */
     private String numDocUsu;
-
-    /** Tipo de documento */
     private String tipoDocUsu;
 
-    /** Correo electrónico */
     private String correoUsuario;
-
-    /** Fecha de creación */
     private OffsetDateTime fechaCreacion;
 
-    // ── Getters y Setters ────────────────────────────────────────────────────
+    /** 0 = No requerido, 1 = Requerido. */
+    private Integer cambioClaveRequerido;
 
-    public Long getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
+    private OffsetDateTime fechaUltimoCambioClave;
+    private OffsetDateTime fechaActivacion;
+    private Long idUsuActivador;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    /** True cuando el usuario esta activo. */
+    private Boolean puedeIngresar;
 
-    public Integer getEstadoUsuario() { return estadoUsuario; }
-    public void setEstadoUsuario(Integer estadoUsuario) { this.estadoUsuario = estadoUsuario; }
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
 
-    public Long getIdRol() { return idRol; }
-    public void setIdRol(Long idRol) { this.idRol = idRol; }
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
-    public String getNombreRol() { return nombreRol; }
-    public void setNombreRol(String nombreRol) { this.nombreRol = nombreRol; }
+    public String getUsername() {
+        return username;
+    }
 
-    public Long getIdEntidad() { return idEntidad; }
-    public void setIdEntidad(Long idEntidad) { this.idEntidad = idEntidad; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getNombreEntidad() { return nombreEntidad; }
-    public void setNombreEntidad(String nombreEntidad) { this.nombreEntidad = nombreEntidad; }
+    public Integer getEstadoUsuario() {
+        return estadoUsuario;
+    }
 
-    public String getNombreUsuario() { return nombreUsuario; }
-    public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
+    public void setEstadoUsuario(Integer estadoUsuario) {
+        this.estadoUsuario = estadoUsuario;
+        this.nombreEstadoUsuario = resolverNombreEstado(estadoUsuario);
+        this.puedeIngresar = Integer.valueOf(1).equals(estadoUsuario);
+    }
 
-    public String getApellidoUsuario() { return apellidoUsuario; }
-    public void setApellidoUsuario(String apellidoUsuario) { this.apellidoUsuario = apellidoUsuario; }
+    public String getNombreEstadoUsuario() {
+        return nombreEstadoUsuario;
+    }
 
-    public String getNumDocUsu() { return numDocUsu; }
-    public void setNumDocUsu(String numDocUsu) { this.numDocUsu = numDocUsu; }
+    public void setNombreEstadoUsuario(String nombreEstadoUsuario) {
+        this.nombreEstadoUsuario = nombreEstadoUsuario;
+    }
 
-    public String getTipoDocUsu() { return tipoDocUsu; }
-    public void setTipoDocUsu(String tipoDocUsu) { this.tipoDocUsu = tipoDocUsu; }
+    public Long getIdRol() {
+        return idRol;
+    }
 
-    public String getCorreoUsuario() { return correoUsuario; }
-    public void setCorreoUsuario(String correoUsuario) { this.correoUsuario = correoUsuario; }
+    public void setIdRol(Long idRol) {
+        this.idRol = idRol;
+    }
 
-    public OffsetDateTime getFechaCreacion() { return fechaCreacion; }
-    public void setFechaCreacion(OffsetDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    public String getNombreRol() {
+        return nombreRol;
+    }
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
+    public Long getIdEntidad() {
+        return idEntidad;
+    }
+
+    public void setIdEntidad(Long idEntidad) {
+        this.idEntidad = idEntidad;
+    }
+
+    public String getNombreEntidad() {
+        return nombreEntidad;
+    }
+
+    public void setNombreEntidad(String nombreEntidad) {
+        this.nombreEntidad = nombreEntidad;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getApellidoUsuario() {
+        return apellidoUsuario;
+    }
+
+    public void setApellidoUsuario(String apellidoUsuario) {
+        this.apellidoUsuario = apellidoUsuario;
+    }
+
+    public String getNumDocUsu() {
+        return numDocUsu;
+    }
+
+    public void setNumDocUsu(String numDocUsu) {
+        this.numDocUsu = numDocUsu;
+    }
+
+    public String getTipoDocUsu() {
+        return tipoDocUsu;
+    }
+
+    public void setTipoDocUsu(String tipoDocUsu) {
+        this.tipoDocUsu = tipoDocUsu;
+    }
+
+    public String getCorreoUsuario() {
+        return correoUsuario;
+    }
+
+    public void setCorreoUsuario(String correoUsuario) {
+        this.correoUsuario = correoUsuario;
+    }
+
+    public OffsetDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(OffsetDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public Integer getCambioClaveRequerido() {
+        return cambioClaveRequerido;
+    }
+
+    public void setCambioClaveRequerido(Integer cambioClaveRequerido) {
+        this.cambioClaveRequerido = cambioClaveRequerido;
+    }
+
+    public OffsetDateTime getFechaUltimoCambioClave() {
+        return fechaUltimoCambioClave;
+    }
+
+    public void setFechaUltimoCambioClave(OffsetDateTime fechaUltimoCambioClave) {
+        this.fechaUltimoCambioClave = fechaUltimoCambioClave;
+    }
+
+    public OffsetDateTime getFechaActivacion() {
+        return fechaActivacion;
+    }
+
+    public void setFechaActivacion(OffsetDateTime fechaActivacion) {
+        this.fechaActivacion = fechaActivacion;
+    }
+
+    public Long getIdUsuActivador() {
+        return idUsuActivador;
+    }
+
+    public void setIdUsuActivador(Long idUsuActivador) {
+        this.idUsuActivador = idUsuActivador;
+    }
+
+    public Boolean getPuedeIngresar() {
+        return puedeIngresar;
+    }
+
+    public void setPuedeIngresar(Boolean puedeIngresar) {
+        this.puedeIngresar = puedeIngresar;
+    }
+
+    /** Texto amigable para mostrar el estado en la interfaz. */
+    private String resolverNombreEstado(Integer estado) {
+        if (estado == null) {
+            return "Desconocido";
+        }
+
+        switch (estado) {
+            case 0:
+                return "Inactivo";
+            case 1:
+                return "Activo";
+            case 2:
+                return "Pendiente";
+            default:
+                return "Desconocido";
+        }
+    }
 }

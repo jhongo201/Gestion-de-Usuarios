@@ -1,302 +1,602 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="es">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+
 <head th:replace="fragments/layout :: head('Usuarios')"></head>
+
 <body>
 
-<div th:replace="fragments/navbar :: navbar"></div>
-<div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="fragments/navbar :: navbar"></div>
+    <div th:replace="fragments/sidebar :: sidebar"></div>
 
-<main class="main-content">
+    <main class="main-content">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-0 fw-bold text-dark">
-                <i class="bi bi-people me-2 text-primary"></i>Usuarios
-            </h4>
-            <small class="text-muted">Gestión de usuarios del sistema</small>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-0 fw-bold text-dark">
+                    <i class="bi bi-people me-2 text-primary"></i>Usuarios
+                </h4>
+                <small class="text-muted">Gestión de usuarios del sistema</small>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+                <i class="bi bi-plus-lg me-2"></i>Nuevo usuario
+            </button>
         </div>
-        <button class="btn btn-primary"
-                data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
-            <i class="bi bi-plus-lg me-2"></i>Nuevo usuario
-        </button>
-    </div>
 
-    <!-- Tabla -->
-    <div class="card table-card">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Usuario</th>
-                        <th>Nombre completo</th>
-                        <th>Rol</th>
-                        <th>Correo</th>
-                        <th>Estado</th>
-                        <th>Creación</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="u : ${usuarios}">
-                        <td th:text="${u.idUsuario}"></td>
-                        <td>
-                            <i class="bi bi-person-circle me-1 text-secondary"></i>
-                            <span th:text="${u.username}"></span>
-                        </td>
-                        <td th:text="${u.nombreUsuario + ' ' + u.apellidoUsuario}"></td>
-                        <td>
-                            <span class="badge bg-primary bg-opacity-10 text-primary"
-                                  th:text="${u.nombreRol}"></span>
-                        </td>
-                        <td th:text="${u.correoUsuario}"></td>
-                        <td>
-                            <span th:if="${u.estadoUsuario == 1}"
-                                  class="badge badge-activo px-2 py-1 rounded-pill">
-                                Activo
-                            </span>
-                            <span th:unless="${u.estadoUsuario == 1}"
-                                  class="badge badge-inactivo px-2 py-1 rounded-pill">
-                                Inactivo
-                            </span>
-                        </td>
-                        <td th:text="${#temporals.format(u.fechaCreacion, 'dd/MM/yyyy')}"></td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary me-1"
-                                    th:data-id="${u.idUsuario}"
-                                    th:data-username="${u.username}"
-                                    th:data-nombre="${u.nombreUsuario}"
-                                    th:data-apellido="${u.apellidoUsuario}"
-                                    th:data-correo="${u.correoUsuario}"
-                                    th:data-rol="${u.idRol}"
-                                    onclick="abrirEditar(this)">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger"
-                                    th:data-id="${u.idUsuario}"
-                                    th:data-username="${u.username}"
-                                    onclick="confirmarDesactivar(this)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(usuarios)}">
-                        <td colspan="8" class="text-center text-muted py-4">
-                            No hay usuarios registrados
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div th:if="${usuariosPendientes > 0}"
+            class="alert alert-warning d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong th:text="${usuariosPendientes}">0</strong>
+                usuario(s) pendiente(s) de aprobación.
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-dark" onclick="filtrarUsuarios('2')">
+                Ver pendientes
+            </button>
         </div>
-    </div>
 
-    <!-- Modal Crear Usuario -->
-    <div class="modal fade" id="modalCrearUsuario" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white"
-                            data-bs-dismiss="modal"></button>
-                </div>
-                <form id="formCrear">
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Usuario *</label>
-                                <input type="text" class="form-control"
-                                       id="crearUsername" required/>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Contraseña *</label>
-                                <input type="password" class="form-control"
-                                       id="crearClave" required/>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-semibold">Nombre *</label>
-                                <input type="text" class="form-control"
-                                       id="crearNombre" required/>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-semibold">Apellido *</label>
-                                <input type="text" class="form-control"
-                                       id="crearApellido" required/>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Correo</label>
-                                <input type="email" class="form-control"
-                                       id="crearCorreo"/>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Rol *</label>
-                                <select class="form-select" id="crearRol" required>
-                                    <option value="">Seleccione...</option>
-                                    <option th:each="r : ${roles}"
-                                            th:value="${r.idRol}"
-                                            th:text="${r.nombreRol}"></option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                                data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save me-1"></i>Guardar
-                        </button>
-                    </div>
-                </form>
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-primary active" data-filter-button="todos"
+                onclick="filtrarUsuarios('todos')">
+                Todos
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-success" data-filter-button="1"
+                onclick="filtrarUsuarios('1')">
+                Activos
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-warning" data-filter-button="2"
+                onclick="filtrarUsuarios('2')">
+                Pendientes
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filter-button="0"
+                onclick="filtrarUsuarios('0')">
+                Inactivos
+            </button>
+        </div>
+
+        <div class="card table-card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Usuario</th>
+                            <th>Nombre completo</th>
+                            <th>Documento</th>
+                            <th>Rol</th>
+                            <th>Correo</th>
+                            <th>Estado</th>
+                            <th>Creación</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${usuarios}" th:data-estado="${u.estadoUsuario}">
+                            <td th:text="${u.idUsuario}"></td>
+                            <td>
+                                <i class="bi bi-person-circle me-1 text-secondary"></i>
+                                <span th:text="${u.username}"></span>
+                            </td>
+                            <td th:text="${u.nombreUsuario + ' ' + u.apellidoUsuario}"></td>
+                            <td>
+                                <span th:text="${u.tipoDocUsu}"></span>
+                                <span th:if="${u.tipoDocUsu != null and u.numDocUsu != null}"> - </span>
+                                <span th:text="${u.numDocUsu}"></span>
+                            </td>
+                            <td>
+                                <span class="role-text" th:text="${u.nombreRol}"></span>
+                            </td>
+
+                            <td th:text="${u.correoUsuario}"></td>
+                            <td>
+                                <span th:if="${u.estadoUsuario == 1}" class="badge badge-activo px-2 py-1 rounded-pill">
+                                    Activo
+                                </span>
+                                <span th:if="${u.estadoUsuario == 2}"
+                                    class="badge bg-warning text-dark px-2 py-1 rounded-pill">
+                                    Pendiente
+                                </span>
+                                <span th:if="${u.estadoUsuario == 0}"
+                                    class="badge badge-inactivo px-2 py-1 rounded-pill">
+                                    Inactivo
+                                </span>
+                            </td>
+                            <td th:text="${#temporals.format(u.fechaCreacion, 'dd/MM/yyyy')}"></td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-primary me-1" th:data-id="${u.idUsuario}"
+                                    th:data-username="${u.username}" th:data-nombre="${u.nombreUsuario}"
+                                    th:data-apellido="${u.apellidoUsuario}" th:data-correo="${u.correoUsuario}"
+                                    th:data-rol="${u.idRol}" th:data-tipo-doc="${u.tipoDocUsu}"
+                                    th:data-num-doc="${u.numDocUsu}" th:data-estado="${u.estadoUsuario}"
+                                    th:data-cambio-clave="${u.cambioClaveRequerido}" onclick="abrirEditar(this)"
+                                    title="Editar usuario">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button th:if="${u.estadoUsuario != 1}" class="btn btn-sm btn-outline-success me-1"
+                                    th:data-id="${u.idUsuario}" th:data-username="${u.username}"
+                                    onclick="confirmarActivar(this)" title="Activar usuario">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+
+                                <button th:if="${u.estadoUsuario == 1}" class="btn btn-sm btn-outline-danger"
+                                    th:data-id="${u.idUsuario}" th:data-username="${u.username}"
+                                    onclick="confirmarDesactivar(this)" title="Desactivar usuario">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(usuarios)}">
+                            <td colspan="9" class="text-center text-muted py-4">
+                                No hay usuarios registrados
+                            </td>
+                        </tr>
+
+                        <tr id="filaSinResultados" style="display:none;">
+                            <td colspan="9" class="text-center text-muted py-4">
+                                No hay usuarios para el filtro seleccionado
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Editar Usuario -->
-    <div class="modal fade" id="modalEditarUsuario" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title">
-                        <i class="bi bi-pencil me-2"></i>Editar Usuario
-                    </h5>
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="modal"></button>
-                </div>
-                <form id="formEditar">
-                    <input type="hidden" id="editarId"/>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Usuario</label>
-                                <input type="text" class="form-control"
-                                       id="editarUsername" readonly/>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">
-                                    Nueva contraseña
-                                    <small class="text-muted">(dejar vacío para no cambiar)</small>
-                                </label>
-                                <input type="password" class="form-control"
-                                       id="editarClave"/>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-semibold">Nombre *</label>
-                                <input type="text" class="form-control"
-                                       id="editarNombre" required/>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-semibold">Apellido *</label>
-                                <input type="text" class="form-control"
-                                       id="editarApellido" required/>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Correo</label>
-                                <input type="email" class="form-control"
-                                       id="editarCorreo"/>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Rol *</label>
-                                <select class="form-select" id="editarRol" required>
-                                    <option th:each="r : ${roles}"
-                                            th:value="${r.idRol}"
-                                            th:text="${r.nombreRol}"></option>
-                                </select>
+        <!-- Modal Crear Usuario -->
+        <div class="modal fade" id="modalCrearUsuario" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <form id="formCrear">
+                        <div class="modal-body">
+                            <div class="row g-3">
+
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label fw-semibold">Usuario *</label>
+                                    <input type="text" class="form-control" id="crearUsername" required />
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label fw-semibold">Contraseña *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="crearClave" required
+                                            oninput="validarClaveVisual('crearClave', 'crearClaveMsg')" />
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePassword('crearClave', 'eyeCrearClave')">
+                                            <i class="bi bi-eye" id="eyeCrearClave"></i>
+                                        </button>
+                                    </div>
+                                    <div id="crearClaveMsg" class="form-text text-muted">
+                                        Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Nombre *</label>
+                                    <input type="text" class="form-control" id="crearNombre" required />
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Apellido *</label>
+                                    <input type="text" class="form-control" id="crearApellido" required />
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Tipo documento</label>
+                                    <select class="form-select" id="crearTipoDoc">
+                                        <option value="">Seleccione...</option>
+                                        <option value="CC">CC - CÉDULA DE CIUDADANÍA</option>
+                                        <option value="CE">CE - CÉDULA DE EXTRANJERÍA</option>
+                                        <option value="PA">PA - PASAPORTE</option>
+                                        <option value="TI">TI - TARJETA DE IDENTIDAD</option>
+                                        <option value="PT">PT - PPT</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Número documento</label>
+                                    <input type="text" class="form-control" id="crearNumDoc" />
+                                </div>
+
+                                <div class="col-12 col-md-9">
+                                    <label class="form-label fw-semibold">Correo</label>
+                                    <input type="email" class="form-control" id="crearCorreo" />
+                                </div>
+
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Rol *</label>
+                                    <select class="form-select" id="crearRol" required>
+                                        <option value="">Seleccione...</option>
+                                        <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}">
+                                        </option>
+                                    </select>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                                data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-save me-1"></i>Actualizar
-                        </button>
-                    </div>
-                </form>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-</main>
+        <!-- Modal Editar Usuario -->
+        <div class="modal fade" id="modalEditarUsuario" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="bi bi-pencil me-2"></i>Editar Usuario
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/app.js}"></script>
-<script th:inline="javascript">
-    const CTX = /*[[@{/}]]*/ '/';
+                    <form id="formEditar">
+                        <input type="hidden" id="editarId" />
 
-    /* ── Crear usuario ───────────────────────────────────────────────────── */
-    document.getElementById('formCrear').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const body = {
-            username:        document.getElementById('crearUsername').value,
-            clave:           document.getElementById('crearClave').value,
-            nombreUsuario:   document.getElementById('crearNombre').value,
-            apellidoUsuario: document.getElementById('crearApellido').value,
-            correoUsuario:   document.getElementById('crearCorreo').value,
-            idRol:           parseInt(document.getElementById('crearRol').value),
-            idEntidad:       1
-        };
-        const r = await fetch(CTX + 'api/usuarios', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(body)
+                        <div class="modal-body">
+                            <div class="row g-3">
+
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label fw-semibold">Usuario</label>
+                                    <input type="text" class="form-control" id="editarUsername" readonly />
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label fw-semibold">
+                                        Nueva contraseña
+                                        <small class="text-muted">(opcional)</small>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="editarClave"
+                                            oninput="validarClaveVisual('editarClave', 'editarClaveMsg')" />
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePassword('editarClave', 'eyeEditarClave')">
+                                            <i class="bi bi-eye" id="eyeEditarClave"></i>
+                                        </button>
+                                    </div>
+                                    <div id="editarClaveMsg" class="form-text text-muted">
+                                        Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Nombre *</label>
+                                    <input type="text" class="form-control" id="editarNombre" required />
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Apellido *</label>
+                                    <input type="text" class="form-control" id="editarApellido" required />
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Tipo documento</label>
+                                    <select class="form-select" id="editarTipoDoc">
+                                        <option value="">Seleccione...</option>
+                                        <option value="CC">CC - CÉDULA DE CIUDADANÍA</option>
+                                        <option value="CE">CE - CÉDULA DE EXTRANJERÍA</option>
+                                        <option value="PA">PA - PASAPORTE</option>
+                                        <option value="TI">TI - TARJETA DE IDENTIDAD</option>
+                                        <option value="PT">PT - PPT</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Número documento</label>
+                                    <input type="text" class="form-control" id="editarNumDoc" />
+                                </div>
+
+                                <div class="col-12 col-md-9">
+                                    <label class="form-label fw-semibold">Correo</label>
+                                    <input type="email" class="form-control" id="editarCorreo" />
+                                </div>
+
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label fw-semibold">Rol *</label>
+                                    <select class="form-select" id="editarRol" required>
+                                        <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Estado</label>
+                                    <select class="form-select" id="editarEstado" required>
+                                        <option value="1">Activo</option>
+                                        <option value="2">Pendiente</option>
+                                        <option value="0">Inactivo</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Cambio clave</label>
+                                    <select class="form-select" id="editarCambioClave" required>
+                                        <option value="1">Requerido</option>
+                                        <option value="0">No requerido</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save me-1"></i>Actualizar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+
+    <script th:inline="javascript">
+        const CTX = /*[[@{/}]]*/ '/';
+        const CURRENT_ENTITY_ID = /*[[${usuario.idEntidad}]]*/ null;
+
+        /*
+         * Spring Security tiene CSRF activo.
+         * Todo fetch POST, PUT, PATCH o DELETE debe enviar este token.
+         */
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        function jsonHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
+            headers[csrfHeader] = csrfToken;
+            return headers;
+        }
+
+        function csrfHeaders() {
+            const headers = {};
+            headers[csrfHeader] = csrfToken;
+            return headers;
+        }
+
+        function errorMessage(err, fallback) {
+            if (err.mensaje) return err.mensaje;
+            if (err.errores) return Object.values(err.errores).join('\n');
+            return fallback;
+        }
+
+        /*
+         * Muestra u oculta la contraseña.
+         */
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        }
+
+        /*
+         * Validacion visual de contraseña.
+         * La validacion definitiva tambien esta en backend.
+         */
+        function validarClaveVisual(inputId, msgId) {
+            const clave = document.getElementById(inputId).value;
+            const msg = document.getElementById(msgId);
+
+            if (!clave) {
+                msg.className = 'form-text text-muted';
+                msg.textContent = 'Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.';
+                return true;
+            }
+
+            const ok = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(clave);
+
+            if (ok) {
+                msg.className = 'form-text text-success';
+                msg.textContent = 'La contraseña cumple la política de seguridad.';
+            } else {
+                msg.className = 'form-text text-danger';
+                msg.textContent = 'Debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.';
+            }
+
+            return ok;
+        }
+
+        /*
+         * Filtro de tabla por estado.
+         * No consulta backend; solo oculta/muestra filas ya cargadas.
+         */
+        function filtrarUsuarios(estado) {
+            const rows = document.querySelectorAll('tbody tr[data-estado]');
+            let visibles = 0;
+
+            rows.forEach(row => {
+                const mostrar = estado === 'todos' || row.dataset.estado === estado;
+                row.style.display = mostrar ? '' : 'none';
+                if (mostrar) visibles++;
+            });
+
+            document.getElementById('filaSinResultados').style.display =
+                visibles === 0 ? '' : 'none';
+
+            document.querySelectorAll('[data-filter-button]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const activeBtn = document.querySelector('[data-filter-button="' + estado + '"]');
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        /*
+         * Crear usuario desde ADMIN_RC.
+         * Se crea activo y con cambio obligatorio de contraseña.
+         */
+        document.getElementById('formCrear').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (!validarClaveVisual('crearClave', 'crearClaveMsg')) {
+                alert('La contraseña no cumple la política de seguridad.');
+                return;
+            }
+
+            const body = {
+                username: document.getElementById('crearUsername').value,
+                clave: document.getElementById('crearClave').value,
+                nombreUsuario: document.getElementById('crearNombre').value,
+                apellidoUsuario: document.getElementById('crearApellido').value,
+                tipoDocUsu: document.getElementById('crearTipoDoc').value,
+                numDocUsu: document.getElementById('crearNumDoc').value,
+                correoUsuario: document.getElementById('crearCorreo').value,
+                idRol: parseInt(document.getElementById('crearRol').value),
+                idEntidad: CURRENT_ENTITY_ID,
+                estadoUsuario: 1,
+                cambioClaveRequerido: 1
+            };
+
+            const r = await fetch(CTX + 'api/usuarios', {
+                method: 'POST',
+                headers: jsonHeaders(),
+                body: JSON.stringify(body)
+            });
+
+            if (r.ok) {
+                location.reload();
+            } else {
+                const err = await r.json();
+                alert('Error: ' + errorMessage(err, 'No se pudo crear el usuario'));
+            }
         });
-        if (r.ok) { location.reload(); }
-        else {
-            const err = await r.json();
-            alert('Error: ' + (err.mensaje || 'No se pudo crear el usuario'));
+
+        /*
+         * Abrir modal editar.
+         */
+        function abrirEditar(btn) {
+            document.getElementById('editarId').value = btn.dataset.id;
+            document.getElementById('editarUsername').value = btn.dataset.username;
+            document.getElementById('editarNombre').value = btn.dataset.nombre || '';
+            document.getElementById('editarApellido').value = btn.dataset.apellido || '';
+            document.getElementById('editarCorreo').value = btn.dataset.correo || '';
+            document.getElementById('editarRol').value = btn.dataset.rol;
+            document.getElementById('editarTipoDoc').value = btn.dataset.tipoDoc || '';
+            document.getElementById('editarNumDoc').value = btn.dataset.numDoc || '';
+            document.getElementById('editarEstado').value = btn.dataset.estado;
+            document.getElementById('editarCambioClave').value = btn.dataset.cambioClave || '0';
+            document.getElementById('editarClave').value = '';
+
+            validarClaveVisual('editarClave', 'editarClaveMsg');
+
+            new bootstrap.Modal(
+                document.getElementById('modalEditarUsuario')
+            ).show();
         }
-    });
 
-    /* ── Abrir modal editar ──────────────────────────────────────────────── */
-    function abrirEditar(btn) {
-        document.getElementById('editarId').value       = btn.dataset.id;
-        document.getElementById('editarUsername').value = btn.dataset.username;
-        document.getElementById('editarNombre').value   = btn.dataset.nombre;
-        document.getElementById('editarApellido').value = btn.dataset.apellido;
-        document.getElementById('editarCorreo').value   = btn.dataset.correo;
-        document.getElementById('editarRol').value      = btn.dataset.rol;
-        document.getElementById('editarClave').value    = '';
-        new bootstrap.Modal(
-            document.getElementById('modalEditarUsuario')
-        ).show();
-    }
+        /*
+         * Guardar edicion.
+         */
+        document.getElementById('formEditar').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-    /* ── Guardar edición ─────────────────────────────────────────────────── */
-    document.getElementById('formEditar').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const id   = document.getElementById('editarId').value;
-        const clave = document.getElementById('editarClave').value;
-        const body = {
-            username:        document.getElementById('editarUsername').value,
-            nombreUsuario:   document.getElementById('editarNombre').value,
-            apellidoUsuario: document.getElementById('editarApellido').value,
-            correoUsuario:   document.getElementById('editarCorreo').value,
-            idRol:           parseInt(document.getElementById('editarRol').value),
-            idEntidad:       1
-        };
-        if (clave) body.clave = clave;
-        const r = await fetch(CTX + 'api/usuarios/' + id, {
-            method: 'PUT',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(body)
+            const id = document.getElementById('editarId').value;
+            const clave = document.getElementById('editarClave').value;
+
+            if (clave && !validarClaveVisual('editarClave', 'editarClaveMsg')) {
+                alert('La contraseña no cumple la política de seguridad.');
+                return;
+            }
+
+            const body = {
+                username: document.getElementById('editarUsername').value,
+                nombreUsuario: document.getElementById('editarNombre').value,
+                apellidoUsuario: document.getElementById('editarApellido').value,
+                tipoDocUsu: document.getElementById('editarTipoDoc').value,
+                numDocUsu: document.getElementById('editarNumDoc').value,
+                correoUsuario: document.getElementById('editarCorreo').value,
+                idRol: parseInt(document.getElementById('editarRol').value),
+                idEntidad: CURRENT_ENTITY_ID,
+                estadoUsuario: parseInt(document.getElementById('editarEstado').value),
+                cambioClaveRequerido: parseInt(document.getElementById('editarCambioClave').value)
+            };
+
+            if (clave) {
+                body.clave = clave;
+            }
+
+            const r = await fetch(CTX + 'api/usuarios/' + id, {
+                method: 'PUT',
+                headers: jsonHeaders(),
+                body: JSON.stringify(body)
+            });
+
+            if (r.ok) {
+                location.reload();
+            } else {
+                const err = await r.json();
+                alert('Error: ' + errorMessage(err, 'No se pudo actualizar'));
+            }
         });
-        if (r.ok) { location.reload(); }
-        else {
-            const err = await r.json();
-            alert('Error: ' + (err.mensaje || 'No se pudo actualizar'));
-        }
-    });
 
-    /* ── Confirmar desactivar ────────────────────────────────────────────── */
-    function confirmarDesactivar(btn) {
-        if (confirm('¿Desactivar el usuario "' + btn.dataset.username + '"?')) {
-            fetch(CTX + 'api/usuarios/' + btn.dataset.id, { method: 'DELETE' })
-                .then(() => location.reload());
+        /*
+         * Activar usuario pendiente o inactivo.
+         */
+        async function confirmarActivar(btn) {
+            if (!confirm('¿Activar el usuario "' + btn.dataset.username + '"?')) {
+                return;
+            }
+
+            const r = await fetch(CTX + 'api/usuarios/' + btn.dataset.id + '/activar', {
+                method: 'PATCH',
+                headers: csrfHeaders()
+            });
+
+            if (r.ok) {
+                location.reload();
+            } else {
+                const err = await r.json();
+                alert('Error: ' + errorMessage(err, 'No se pudo activar el usuario'));
+            }
         }
-    }
-</script>
+
+        /*
+         * Desactivar usuario activo.
+         */
+        async function confirmarDesactivar(btn) {
+            if (!confirm('¿Desactivar el usuario "' + btn.dataset.username + '"?')) {
+                return;
+            }
+
+            const r = await fetch(CTX + 'api/usuarios/' + btn.dataset.id, {
+                method: 'DELETE',
+                headers: csrfHeaders()
+            });
+
+            if (r.ok) {
+                location.reload();
+            } else {
+                const err = await r.json();
+                alert('Error: ' + errorMessage(err, 'No se pudo desactivar el usuario'));
+            }
+        }
+    </script>
+
 </body>
+
 </html>

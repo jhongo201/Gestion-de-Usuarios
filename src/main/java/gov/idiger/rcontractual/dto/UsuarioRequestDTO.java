@@ -3,84 +3,184 @@ package gov.idiger.rcontractual.dto;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
- * DTO de entrada para crear o editar un usuario.
- * La contraseña solo se recibe en creación o cambio explícito.
+ * DTO de entrada para crear o editar un usuario desde el modulo admin.
  *
- * @author IDIGER – Equipo de Desarrollo
+ * Este DTO tambien acepta datos de documento para mantener un solo contrato
+ * de entrada en el CRUD administrativo.
  */
 public class UsuarioRequestDTO {
 
-    /**
-     * Login único del usuario.
-     * Obligatorio, entre 4 y 100 caracteres.
-     */
+    /** Login unico del usuario. */
     @NotBlank(message = "El username es obligatorio")
     @Size(min = 4, max = 100, message = "El username debe tener entre 4 y 100 caracteres")
     private String username;
 
     /**
-     * Contraseña en texto plano.
-     * Obligatorio solo en creación. En edición puede ser null
-     * para indicar que no se cambia.
+     * Contrasena en texto plano.
+     * En creacion es obligatoria desde la capa de servicio.
+     * En edicion puede venir vacia para conservar la clave actual.
      */
-    @Size(min = 6, message = "La contraseña debe tener mínimo 6 caracteres")
+    @Size(min = 8, message = "La contraseña debe tener mínimo 8 caracteres")
     private String clave;
 
-    /** ID del rol a asignar. Obligatorio. */
+    /** ID del rol a asignar. */
     @NotNull(message = "El ID del rol es obligatorio")
     private Long idRol;
 
-    /** ID de la entidad a la que pertenece. Obligatorio. */
+    /** ID de la entidad a la que pertenece. */
     @NotNull(message = "El ID de la entidad es obligatorio")
     private Long idEntidad;
 
-    /** Nombre del usuario */
+    /** Nombre del usuario. */
     @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre no puede superar 100 caracteres")
     private String nombreUsuario;
 
-    /** Apellido del usuario */
+    /** Apellido del usuario. */
     @NotBlank(message = "El apellido es obligatorio")
+    @Size(max = 100, message = "El apellido no puede superar 100 caracteres")
     private String apellidoUsuario;
 
-    /** Número de documento */
+    /** Numero de documento. */
+    @Size(max = 20, message = "El número de documento no puede superar 20 caracteres")
     private String numDocUsu;
 
-    /** Tipo de documento (CC, CE, NIT, etc.) */
+    /**
+     * Tipo de documento permitido por BD.
+     * CC = Cedula de ciudadania
+     * CE = Cedula de extranjeria
+     * PA = Pasaporte
+     * TI = Tarjeta de identidad
+     * PT = PPT
+     */
+    @Pattern(
+        regexp = "^$|CC|CE|PA|TI|PT",
+        message = "El tipo de documento debe ser CC, CE, PA, TI o PT"
+    )
     private String tipoDocUsu;
 
-    /** Correo electrónico */
+    /** Correo electronico. */
     @Email(message = "El correo no tiene un formato válido")
+    @Size(max = 200, message = "El correo no puede superar 200 caracteres")
     private String correoUsuario;
 
-    // ── Getters y Setters ────────────────────────────────────────────────────
+    /**
+     * Estado solicitado desde administracion.
+     * 0 = Inactivo, 1 = Activo, 2 = Pendiente.
+     * Si no se envia, el servicio conserva su comportamiento por defecto.
+     */
+    private Integer estadoUsuario;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    /**
+     * Indica si debe cambiar clave al ingresar.
+     * 0 = No requerido, 1 = Requerido.
+     */
+    private Integer cambioClaveRequerido;
 
-    public String getClave() { return clave; }
-    public void setClave(String clave) { this.clave = clave; }
+    public String getUsername() {
+        return username;
+    }
 
-    public Long getIdRol() { return idRol; }
-    public void setIdRol(Long idRol) { this.idRol = idRol; }
+    public void setUsername(String username) {
+        this.username = limpiar(username);
+    }
 
-    public Long getIdEntidad() { return idEntidad; }
-    public void setIdEntidad(Long idEntidad) { this.idEntidad = idEntidad; }
+    public String getClave() {
+        return clave;
+    }
 
-    public String getNombreUsuario() { return nombreUsuario; }
-    public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
+    public void setClave(String clave) {
+        this.clave = clave;
+    }
 
-    public String getApellidoUsuario() { return apellidoUsuario; }
-    public void setApellidoUsuario(String apellidoUsuario) { this.apellidoUsuario = apellidoUsuario; }
+    public Long getIdRol() {
+        return idRol;
+    }
 
-    public String getNumDocUsu() { return numDocUsu; }
-    public void setNumDocUsu(String numDocUsu) { this.numDocUsu = numDocUsu; }
+    public void setIdRol(Long idRol) {
+        this.idRol = idRol;
+    }
 
-    public String getTipoDocUsu() { return tipoDocUsu; }
-    public void setTipoDocUsu(String tipoDocUsu) { this.tipoDocUsu = tipoDocUsu; }
+    public Long getIdEntidad() {
+        return idEntidad;
+    }
 
-    public String getCorreoUsuario() { return correoUsuario; }
-    public void setCorreoUsuario(String correoUsuario) { this.correoUsuario = correoUsuario; }
+    public void setIdEntidad(Long idEntidad) {
+        this.idEntidad = idEntidad;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = limpiar(nombreUsuario);
+    }
+
+    public String getApellidoUsuario() {
+        return apellidoUsuario;
+    }
+
+    public void setApellidoUsuario(String apellidoUsuario) {
+        this.apellidoUsuario = limpiar(apellidoUsuario);
+    }
+
+    public String getNumDocUsu() {
+        return numDocUsu;
+    }
+
+    public void setNumDocUsu(String numDocUsu) {
+        this.numDocUsu = limpiar(numDocUsu);
+    }
+
+    public String getTipoDocUsu() {
+        return tipoDocUsu;
+    }
+
+    public void setTipoDocUsu(String tipoDocUsu) {
+        this.tipoDocUsu = limpiarMayuscula(tipoDocUsu);
+    }
+
+    public String getCorreoUsuario() {
+        return correoUsuario;
+    }
+
+    public void setCorreoUsuario(String correoUsuario) {
+        this.correoUsuario = limpiarMinuscula(correoUsuario);
+    }
+
+    public Integer getEstadoUsuario() {
+        return estadoUsuario;
+    }
+
+    public void setEstadoUsuario(Integer estadoUsuario) {
+        this.estadoUsuario = estadoUsuario;
+    }
+
+    public Integer getCambioClaveRequerido() {
+        return cambioClaveRequerido;
+    }
+
+    public void setCambioClaveRequerido(Integer cambioClaveRequerido) {
+        this.cambioClaveRequerido = cambioClaveRequerido;
+    }
+
+    /** Limpia espacios sobrantes sin romper valores nulos. */
+    private String limpiar(String valor) {
+        return valor == null ? null : valor.trim();
+    }
+
+    /** Limpia y normaliza a mayusculas codigos cortos como tipo de documento. */
+    private String limpiarMayuscula(String valor) {
+        return valor == null ? null : valor.trim().toUpperCase();
+    }
+
+    /** Limpia y normaliza correo a minusculas. */
+    private String limpiarMinuscula(String valor) {
+        return valor == null ? null : valor.trim().toLowerCase();
+    }
 }
