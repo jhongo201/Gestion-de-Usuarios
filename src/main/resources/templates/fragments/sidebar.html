@@ -1,78 +1,74 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <body>
-<nav th:fragment="sidebar" class="idiger-sidebar" id="sidebar">
+    <nav th:fragment="sidebar" class="idiger-sidebar" id="sidebar">
 
-    <!-- Encabezado sidebar -->
-    <div class="sidebar-header">
-        <div style="display:flex;align-items:center;gap:.5rem">
-            <i class="bi bi-building" style="color:#3D682C;font-size:1.1rem"></i>
-            <div>
-                <div style="color:#3D682C;font-weight:700;font-size:.88rem">IDIGER</div>
-                <div style="color:#6a8a5a;font-size:.7rem">Módulo de Seguridad</div>
-            </div>
+        <!-- Encabezado sidebar -->
+
+        <div class="sidebar-header sidebar-logo-header">
+            <img th:src="@{/images/200-x-70.png}" alt="IDIGER" class="sidebar-logo" />
         </div>
-    </div>
 
-    <!-- Menú -->
-    <ul style="list-style:none;padding:.5rem;margin:0;flex:1">
+        <!-- Menú -->
+        <ul style="list-style:none;padding:.5rem;margin:0;flex:1">
 
-        <!-- Dashboard -->
-        <li>
-            <a class="sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI == '/rcontractual/dashboard'} ? ' active'"
-               th:href="@{/dashboard}">
-                <i class="bi bi-speedometer2"></i>Dashboard
-            </a>
-        </li>
+            <!-- Dashboard -->
+            <li>
+                <a class="sidebar-link"
+                    th:classappend="${#httpServletRequest.requestURI == '/rcontractual/dashboard'} ? ' active'"
+                    th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2"></i>Dashboard
+                </a>
+            </li>
 
-        <!-- Sección Seguridad -->
-        <li><span class="sidebar-section-title">SEGURIDAD</span></li>
+            <!-- Sección Seguridad -->
+            <li><span class="sidebar-section-title">SEGURIDAD</span></li>
 
-        <li sec:authorize="hasAuthority('RC_ADMIN')">
-            <a class="sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/usuarios')} ? ' active'"
-               th:href="@{/seguridad/usuarios}">
-                <i class="bi bi-people"></i>Usuarios
-            </a>
-        </li>
+            <li sec:authorize="hasAuthority('RC_ADMIN')">
+                <a class="sidebar-link"
+                    th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/usuarios')} ? ' active'"
+                    th:href="@{/seguridad/usuarios}">
+                    <i class="bi bi-people"></i>Usuarios
+                </a>
+            </li>
 
-        <li sec:authorize="hasAuthority('RC_ADMIN')">
-            <a class="sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/roles')} ? ' active'"
-               th:href="@{/seguridad/roles}">
-                <i class="bi bi-person-badge"></i>Roles
-            </a>
-        </li>
+            <li sec:authorize="hasAuthority('RC_ADMIN')">
+                <a class="sidebar-link"
+                    th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/roles')} ? ' active'"
+                    th:href="@{/seguridad/roles}">
+                    <i class="bi bi-person-badge"></i>Roles
+                </a>
+            </li>
 
-        <li sec:authorize="hasAuthority('RC_ADMIN')">
-            <a class="sidebar-link"
-               th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/permisos')} ? ' active'"
-               th:href="@{/seguridad/permisos}">
-                <i class="bi bi-key"></i>Permisos
-            </a>
-        </li>
+            <li sec:authorize="hasAuthority('RC_ADMIN')">
+                <a class="sidebar-link"
+                    th:classappend="${#httpServletRequest.requestURI.contains('/seguridad/permisos')} ? ' active'"
+                    th:href="@{/seguridad/permisos}">
+                    <i class="bi bi-key"></i>Permisos
+                </a>
+            </li>
 
-        <!-- Sección Reportes -->
-        <li><span class="sidebar-section-title">REPORTES</span></li>
+            <!-- Sección Reportes -->
+            <li><span class="sidebar-section-title">REPORTES</span></li>
 
-        <li sec:authorize="hasAuthority('RC_LISTAR')">
-            <a class="sidebar-link" href="#">
-                <i class="bi bi-file-earmark-bar-graph"></i>
-                Reportes Contractuales
-                <span style="margin-left:auto;background:#F0A500;color:#fff;
+            <li sec:authorize="hasAuthority('RC_LISTAR')">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Reportes Contractuales
+                    <span style="margin-left:auto;background:#F0A500;color:#fff;
                              font-size:.63rem;padding:.1rem .4rem;border-radius:2px">
-                    Próximo
-                </span>
-            </a>
-        </li>
+                        Próximo
+                    </span>
+                </a>
+            </li>
 
-    </ul>
+        </ul>
 
-    <!-- Footer -->
-    <div>v1.0.0 — 2026</div>
+        <!-- Footer -->
+        <div>v1.0.0 — 2026</div>
 
-</nav>
+    </nav>
 </body>
+
 </html>

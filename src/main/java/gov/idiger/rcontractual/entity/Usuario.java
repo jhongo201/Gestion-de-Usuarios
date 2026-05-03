@@ -5,135 +5,280 @@ import java.time.OffsetDateTime;
 
 /**
  * Entidad JPA mapeada a CONTRATOS.USUARIO.
- * Representa los usuarios del sistema.
- * La clave se almacena hasheada con BCrypt —
- * nunca se almacena ni se expone en texto plano.
  *
- * @author IDIGER – Equipo de Desarrollo
+ * Estados de usuario:
+ * 0 = Inactivo
+ * 1 = Activo
+ * 2 = Pendiente de aprobacion
+ *
+ * La clave se almacena hasheada con BCrypt.
  */
 @Entity
 @Table(name = "USUARIO", schema = "CONTRATOS")
 public class Usuario {
 
-    /** Identificador único del usuario */
+    /** Usuario inactivo: no puede ingresar al sistema. */
+    public static final int ESTADO_INACTIVO = 0;
+
+    /** Usuario activo: puede ingresar si no tiene otras restricciones. */
+    public static final int ESTADO_ACTIVO = 1;
+
+    /** Usuario solicitado desde formulario publico, pendiente de aprobacion. */
+    public static final int ESTADO_PENDIENTE = 2;
+
+    /** Identificador unico del usuario. */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-                    generator = "seq_usuario")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
     @SequenceGenerator(
-        name         = "seq_usuario",
+        name = "seq_usuario",
         sequenceName = "CONTRATOS.SEQ_USUARIO",
         allocationSize = 1
     )
     @Column(name = "ID_USUARIO", nullable = false)
     private Long idUsuario;
 
-    /** Login único del usuario */
+    /** Login unico del usuario. */
     @Column(name = "USUARIO", nullable = false, length = 100, unique = true)
     private String username;
 
-    /** Contraseña hasheada con BCrypt */
+    /** Contrasena hasheada con BCrypt. */
     @Column(name = "CLAVE", nullable = false, length = 200)
     private String clave;
 
-    /** Estado: 1 = activo, 0 = inactivo */
+    /**
+     * Estado del usuario.
+     * 0 = Inactivo, 1 = Activo, 2 = Pendiente aprobacion.
+     */
     @Column(name = "ESTADO_USUARIO", nullable = false)
     private Integer estadoUsuario;
 
-    /**
-     * Rol del usuario — determina sus permisos.
-     * Cargado de forma EAGER porque siempre se necesita
-     * en el proceso de autenticación.
-     */
+    /** Rol asignado al usuario. */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_ROL", nullable = false)
     private Rol rol;
 
-    /**
-     * Entidad a la que pertenece el usuario.
-     * Define el alcance de datos que puede ver.
-     * Cargado EAGER porque se necesita en la sesión.
-     */
+    /** Entidad a la que pertenece el usuario. */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_ENTIDAD", nullable = false)
     private Entidad entidad;
 
-    /** Nombre del usuario */
+    /** Nombre del usuario. */
     @Column(name = "NOMBRE_USUARIO", length = 100)
     private String nombreUsuario;
 
-    /** Apellido del usuario */
+    /** Apellido del usuario. */
     @Column(name = "APELLIDO_USUARIO", length = 100)
     private String apellidoUsuario;
 
-    /** Número de documento de identidad */
+    /** Numero de documento de identidad. */
     @Column(name = "NUM_DOC_USU", length = 20)
     private String numDocUsu;
 
-    /** Correo electrónico */
+    /** Correo electronico del usuario. */
     @Column(name = "CORREO_USUARIO", length = 200)
     private String correoUsuario;
 
-    /** Fecha y hora de creación con zona horaria */
+    /** Fecha y hora de creacion del registro. */
     @Column(name = "FECHA_CREACION", nullable = false, updatable = false)
     private OffsetDateTime fechaCreacion;
 
-    /** ID del usuario que creó este registro */
+    /** ID del usuario administrador que creo el registro, si aplica. */
     @Column(name = "ID_USU_CREADOR")
     private Long idUsuCreador;
 
-    /** Tipo de documento (CC, CE, NIT, etc.) */
+    /**
+     * Tipo de documento.
+     * Valores permitidos por BD: CC, CE, PA, TI, PT.
+     */
     @Column(name = "TIPO_DOC_USU", length = 10)
     private String tipoDocUsu;
 
-    /** Asigna la fecha de creación antes de insertar */
+    /**
+     * Indica si el usuario debe cambiar clave al ingresar.
+     * 0 = No requerido, 1 = Requerido.
+     */
+    @Column(name = "CAMBIO_CLAVE_REQUERIDO", nullable = false)
+    private Integer cambioClaveRequerido;
+
+    /** Fecha del ultimo cambio de clave. */
+    @Column(name = "FECHA_ULTIMO_CAMBIO_CLAVE")
+    private OffsetDateTime fechaUltimoCambioClave;
+
+    /** Fecha en la que un administrador activo la cuenta. */
+    @Column(name = "FECHA_ACTIVACION")
+    private OffsetDateTime fechaActivacion;
+
+    /** ID del administrador que activo la cuenta. */
+    @Column(name = "ID_USU_ACTIVADOR")
+    private Long idUsuActivador;
+
+    /** Valores por defecto antes de insertar. */
     @PrePersist
     public void prePersist() {
         if (this.fechaCreacion == null) {
             this.fechaCreacion = OffsetDateTime.now();
         }
         if (this.estadoUsuario == null) {
-            this.estadoUsuario = 1;
+            this.estadoUsuario = ESTADO_ACTIVO;
+        }
+        if (this.cambioClaveRequerido == null) {
+            this.cambioClaveRequerido = 0;
         }
     }
 
-    // ── Getters y Setters ────────────────────────────────────────────────────
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
 
-    public Long getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getClave() { return clave; }
-    public void setClave(String clave) { this.clave = clave; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public Integer getEstadoUsuario() { return estadoUsuario; }
-    public void setEstadoUsuario(Integer estadoUsuario) { this.estadoUsuario = estadoUsuario; }
+    public String getClave() {
+        return clave;
+    }
 
-    public Rol getRol() { return rol; }
-    public void setRol(Rol rol) { this.rol = rol; }
+    public void setClave(String clave) {
+        this.clave = clave;
+    }
 
-    public Entidad getEntidad() { return entidad; }
-    public void setEntidad(Entidad entidad) { this.entidad = entidad; }
+    public Integer getEstadoUsuario() {
+        return estadoUsuario;
+    }
 
-    public String getNombreUsuario() { return nombreUsuario; }
-    public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
+    public void setEstadoUsuario(Integer estadoUsuario) {
+        this.estadoUsuario = estadoUsuario;
+    }
 
-    public String getApellidoUsuario() { return apellidoUsuario; }
-    public void setApellidoUsuario(String apellidoUsuario) { this.apellidoUsuario = apellidoUsuario; }
+    public Rol getRol() {
+        return rol;
+    }
 
-    public String getNumDocUsu() { return numDocUsu; }
-    public void setNumDocUsu(String numDocUsu) { this.numDocUsu = numDocUsu; }
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
 
-    public String getCorreoUsuario() { return correoUsuario; }
-    public void setCorreoUsuario(String correoUsuario) { this.correoUsuario = correoUsuario; }
+    public Entidad getEntidad() {
+        return entidad;
+    }
 
-    public OffsetDateTime getFechaCreacion() { return fechaCreacion; }
-    public void setFechaCreacion(OffsetDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    public void setEntidad(Entidad entidad) {
+        this.entidad = entidad;
+    }
 
-    public Long getIdUsuCreador() { return idUsuCreador; }
-    public void setIdUsuCreador(Long idUsuCreador) { this.idUsuCreador = idUsuCreador; }
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
 
-    public String getTipoDocUsu() { return tipoDocUsu; }
-    public void setTipoDocUsu(String tipoDocUsu) { this.tipoDocUsu = tipoDocUsu; }
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getApellidoUsuario() {
+        return apellidoUsuario;
+    }
+
+    public void setApellidoUsuario(String apellidoUsuario) {
+        this.apellidoUsuario = apellidoUsuario;
+    }
+
+    public String getNumDocUsu() {
+        return numDocUsu;
+    }
+
+    public void setNumDocUsu(String numDocUsu) {
+        this.numDocUsu = numDocUsu;
+    }
+
+    public String getCorreoUsuario() {
+        return correoUsuario;
+    }
+
+    public void setCorreoUsuario(String correoUsuario) {
+        this.correoUsuario = correoUsuario;
+    }
+
+    public OffsetDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(OffsetDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public Long getIdUsuCreador() {
+        return idUsuCreador;
+    }
+
+    public void setIdUsuCreador(Long idUsuCreador) {
+        this.idUsuCreador = idUsuCreador;
+    }
+
+    public String getTipoDocUsu() {
+        return tipoDocUsu;
+    }
+
+    public void setTipoDocUsu(String tipoDocUsu) {
+        this.tipoDocUsu = tipoDocUsu;
+    }
+
+    public Integer getCambioClaveRequerido() {
+        return cambioClaveRequerido;
+    }
+
+    public void setCambioClaveRequerido(Integer cambioClaveRequerido) {
+        this.cambioClaveRequerido = cambioClaveRequerido;
+    }
+
+    public OffsetDateTime getFechaUltimoCambioClave() {
+        return fechaUltimoCambioClave;
+    }
+
+    public void setFechaUltimoCambioClave(OffsetDateTime fechaUltimoCambioClave) {
+        this.fechaUltimoCambioClave = fechaUltimoCambioClave;
+    }
+
+    public OffsetDateTime getFechaActivacion() {
+        return fechaActivacion;
+    }
+
+    public void setFechaActivacion(OffsetDateTime fechaActivacion) {
+        this.fechaActivacion = fechaActivacion;
+    }
+
+    public Long getIdUsuActivador() {
+        return idUsuActivador;
+    }
+
+    public void setIdUsuActivador(Long idUsuActivador) {
+        this.idUsuActivador = idUsuActivador;
+    }
+
+    /** Indica si el usuario esta activo. */
+    public boolean estaActivo() {
+        return Integer.valueOf(ESTADO_ACTIVO).equals(this.estadoUsuario);
+    }
+
+    /** Indica si el usuario esta pendiente de aprobacion. */
+    public boolean estaPendiente() {
+        return Integer.valueOf(ESTADO_PENDIENTE).equals(this.estadoUsuario);
+    }
+
+    /** Indica si el usuario esta inactivo. */
+    public boolean estaInactivo() {
+        return Integer.valueOf(ESTADO_INACTIVO).equals(this.estadoUsuario);
+    }
+
+    /** Indica si debe cambiar clave antes de usar el sistema. */
+    public boolean debeCambiarClave() {
+        return Integer.valueOf(1).equals(this.cambioClaveRequerido);
+    }
 }

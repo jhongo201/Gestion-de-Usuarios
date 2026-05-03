@@ -1,57 +1,87 @@
 package gov.idiger.rcontractual.service;
 
+import gov.idiger.rcontractual.dto.SolicitudUsuarioRequestDTO;
 import gov.idiger.rcontractual.dto.UsuarioDTO;
 import gov.idiger.rcontractual.dto.UsuarioRequestDTO;
 
 import java.util.List;
 
 /**
- * Interfaz de servicio para la gestión de usuarios (CRUD).
+ * Servicio para la gestion de usuarios.
  *
- * @author IDIGER – Equipo de Desarrollo
+ * Cubre el CRUD administrativo, la solicitud publica de usuarios y las
+ * operaciones de activacion, desactivacion y consulta de usuarios pendientes.
  */
 public interface UsuarioService {
 
     /**
      * Lista todos los usuarios activos.
-     * @return lista de usuarios activos
      */
     List<UsuarioDTO> listarActivos();
 
     /**
-     * Lista los usuarios activos de una entidad específica.
-     * @param idEntidad ID de la entidad
-     * @return lista de usuarios de esa entidad
+     * Lista todos los usuarios sin filtrar estado.
+     */
+    List<UsuarioDTO> listarTodos();
+
+    /**
+     * Lista usuarios por estado.
+     * 0 = Inactivo, 1 = Activo, 2 = Pendiente.
+     */
+    List<UsuarioDTO> listarPorEstado(Integer estadoUsuario);
+
+    /**
+     * Lista usuarios de una entidad sin filtrar estado.
      */
     List<UsuarioDTO> listarPorEntidad(Long idEntidad);
 
     /**
      * Busca un usuario por su ID.
-     * @param idUsuario ID del usuario
-     * @return DTO del usuario encontrado
      */
     UsuarioDTO buscarPorId(Long idUsuario);
 
     /**
-     * Crea un nuevo usuario hasheando la contraseña con BCrypt.
-     * @param request DTO con los datos del nuevo usuario
-     * @return DTO del usuario creado
+     * Cuenta usuarios pendientes de aprobacion.
+     */
+    long contarPendientes();
+
+    /**
+     * Crea un usuario desde el modulo administrativo.
      */
     UsuarioDTO crear(UsuarioRequestDTO request);
 
     /**
-     * Actualiza los datos de un usuario.
-     * Si request.getClave() es null no cambia la contraseña.
-     * @param idUsuario ID del usuario a actualizar
-     * @param request   DTO con los nuevos datos
-     * @return DTO del usuario actualizado
+     * Registra una solicitud publica de usuario.
+     *
+     * El usuario queda en estado pendiente para revision del administrador.
+     */
+    UsuarioDTO solicitarUsuario(SolicitudUsuarioRequestDTO request);
+
+    /**
+     * Actualiza datos de un usuario.
      */
     UsuarioDTO actualizar(Long idUsuario, UsuarioRequestDTO request);
 
     /**
-     * Desactiva un usuario (ESTADO_USUARIO = 0).
-     * No elimina el registro físicamente.
-     * @param idUsuario ID del usuario a desactivar
+     * Activa un usuario pendiente o inactivo.
+     *
+     * @param idUsuario ID del usuario a activar
+     * @param idAdmin   ID del administrador que realiza la activacion
+     */
+    UsuarioDTO activar(Long idUsuario, Long idAdmin);
+
+    /**
+     * Cambia la contraseña del usuario autenticado y desactiva
+     * la marca de cambio obligatorio.
+     *
+     * @param idUsuario      ID del usuario autenticado
+     * @param nuevaClave     nueva contraseña en texto plano
+     * @param confirmarClave confirmación de la nueva contraseña
+     */
+    void cambiarClaveObligatoria(Long idUsuario, String nuevaClave, String confirmarClave);
+
+    /**
+     * Desactiva un usuario.
      */
     void desactivar(Long idUsuario);
 }

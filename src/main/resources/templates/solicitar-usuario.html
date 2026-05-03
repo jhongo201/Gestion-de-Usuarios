@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Solicitar Usuario de Ingreso</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: #f6f8f5;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #1f2a1f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .request-card {
+            width: 100%;
+            max-width: 760px;
+            background: #fff;
+            border: 1px solid #d9e2d4;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+            padding: 2rem;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1.4rem;
+        }
+
+        .logo-container img {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: .5rem;
+            color: #102010;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #526052;
+            font-size: .95rem;
+            margin-bottom: 1.6rem;
+            line-height: 1.45;
+        }
+
+        .form-label {
+            font-size: .9rem;
+            font-weight: 600;
+            color: #1f2a1f;
+            margin-bottom: .35rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #b9cbb1;
+            border-radius: 4px;
+            min-height: 38px;
+            font-size: .94rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #3d682c;
+            box-shadow: 0 0 0 .2rem rgba(61, 104, 44, .16);
+        }
+
+        .input-group .form-control {
+            border-right: none;
+        }
+
+        .input-group .btn-outline-secondary {
+            border-color: #b9cbb1;
+            color: #526052;
+            background: #fff;
+        }
+
+        .input-group .btn-outline-secondary:hover {
+            background: #f2f6f0;
+            color: #2d4f20;
+        }
+
+        .policy {
+            font-size: .82rem;
+            color: #526052;
+        }
+
+        .btn-submit {
+            background: #3d682c;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            padding: .68rem 1.2rem;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background: #315823;
+            color: #fff;
+        }
+
+        .btn-back {
+            color: #16459b;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: .9rem;
+        }
+
+        .btn-back:hover {
+            color: #0f2f70;
+            text-decoration: underline;
+        }
+
+        .alert {
+            font-size: .9rem;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 576px) {
+            .request-card {
+                padding: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="request-card">
+
+        <div class="logo-container">
+            <img th:src="@{/images/logo-idiger.png}"
+                alt="IDIGER - Instituto Distrital de Gestión de Riesgos y Cambio Climático" />
+        </div>
+
+        <h1>Solicitar Usuario de Ingreso</h1>
+
+        <p class="subtitle">
+            <span>Complete la información para solicitar acceso al Gestor de Reportes Contractuales.</span>
+            <span class="d-block">La cuenta quedará pendiente de activación por parte del Administrador del
+                sistema.</span>
+        </p>
+
+        <div th:if="${mensaje}" class="alert alert-success d-flex align-items-start gap-2">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${mensaje}">Solicitud registrada correctamente.</span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger d-flex align-items-start gap-2">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${error}">No fue posible registrar la solicitud.</span>
+        </div>
+
+        <form id="solicitudUsuarioForm" th:action="@{/solicitar-usuario}" th:object="${solicitudUsuario}" method="post">
+
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div class="row g-3">
+
+
+                <div class="col-12 col-md-6">
+                    <label for="correoUsuario" class="form-label">Correo *</label>
+                    <input type="email" class="form-control" id="correoUsuario" th:field="*{correoUsuario}"
+                        autocomplete="email" required />
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('correoUsuario')}"
+                        th:errors="*{correoUsuario}">
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="username" class="form-label">Usuario de ingreso *</label>
+                    <input type="text" class="form-control" id="username" th:field="*{username}" autocomplete="username"
+                        required />
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('username')}"
+                        th:errors="*{username}">
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="clave" class="form-label">Contraseña inicial *</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="clave" th:field="*{clave}"
+                            autocomplete="new-password" required />
+                        <button class="btn btn-outline-secondary" type="button" data-password-toggle="clave"
+                            aria-label="Mostrar u ocultar contraseña">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div id="claveMsg" class="policy mt-1">
+                        Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.
+                    </div>
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('clave')}" th:errors="*{clave}">
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="confirmarClave" class="form-label">Confirmar contraseña *</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirmarClave" th:field="*{confirmarClave}"
+                            autocomplete="new-password" required />
+                        <button class="btn btn-outline-secondary" type="button" data-password-toggle="confirmarClave"
+                            aria-label="Mostrar u ocultar confirmación">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div id="confirmarMsg" class="policy mt-1"></div>
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('confirmarClave')}"
+                        th:errors="*{confirmarClave}">
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6">
+                    <label for="nombreUsuario" class="form-label">Nombre *</label>
+                    <input type="text" class="form-control" id="nombreUsuario" th:field="*{nombreUsuario}" required />
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('nombreUsuario')}"
+                        th:errors="*{nombreUsuario}">
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="apellidoUsuario" class="form-label">Apellido *</label>
+                    <input type="text" class="form-control" id="apellidoUsuario" th:field="*{apellidoUsuario}"
+                        required />
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('apellidoUsuario')}"
+                        th:errors="*{apellidoUsuario}">
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="tipoDocUsu" class="form-label">Tipo documento *</label>
+                    <select class="form-select" id="tipoDocUsu" th:field="*{tipoDocUsu}" required>
+                        <option value="">Seleccione...</option>
+                        <option value="CC">CC - CÉDULA DE CIUDADANÍA</option>
+                        <option value="CE">CE - CÉDULA DE EXTRANJERÍA</option>
+                        <option value="PA">PA - PASAPORTE</option>
+                        <option value="TI">TI - TARJETA DE IDENTIDAD</option>
+                        <option value="PT">PT - PPT</option>
+                    </select>
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('tipoDocUsu')}"
+                        th:errors="*{tipoDocUsu}">
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="numDocUsu" class="form-label">Número documento *</label>
+                    <input type="text" class="form-control" id="numDocUsu" th:field="*{numDocUsu}" required />
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('numDocUsu')}"
+                        th:errors="*{numDocUsu}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
+                <a class="btn-back" th:href="@{/login}">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al ingreso
+                </a>
+
+                <button type="submit" class="btn btn-submit">
+                    Registrar solicitud <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </form>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const clave = document.getElementById('clave');
+            const confirmarClave = document.getElementById('confirmarClave');
+            const form = document.getElementById('solicitudUsuarioForm');
+
+            document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const inputId = button.getAttribute('data-password-toggle');
+                    const input = document.getElementById(inputId);
+                    const icon = button.querySelector('i');
+
+                    if (!input || !icon) {
+                        return;
+                    }
+
+                    const mostrar = input.type === 'password';
+                    input.type = mostrar ? 'text' : 'password';
+                    icon.className = mostrar ? 'bi bi-eye-slash' : 'bi bi-eye';
+                });
+            });
+
+            clave.addEventListener('input', function () {
+                validarClave();
+                validarConfirmacion();
+            });
+
+            confirmarClave.addEventListener('input', function () {
+                validarConfirmacion();
+            });
+
+            form.addEventListener('submit', function (e) {
+                if (!claveCumplePolitica(clave.value)) {
+                    e.preventDefault();
+                    validarClave();
+                    clave.focus();
+                    return;
+                }
+
+                if (clave.value !== confirmarClave.value) {
+                    e.preventDefault();
+                    validarConfirmacion();
+                    confirmarClave.focus();
+                }
+            });
+        });
+
+        function claveCumplePolitica(clave) {
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(clave);
+        }
+
+        function validarClave() {
+            const clave = document.getElementById('clave').value;
+            const msg = document.getElementById('claveMsg');
+
+            if (!clave) {
+                msg.className = 'policy mt-1';
+                msg.textContent = 'Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.';
+                return;
+            }
+
+            if (claveCumplePolitica(clave)) {
+                msg.className = 'policy mt-1 text-success';
+                msg.textContent = 'La contraseña cumple la política de seguridad.';
+            } else {
+                msg.className = 'policy mt-1 text-danger';
+                msg.textContent = 'La contraseña no cumple la política de seguridad.';
+            }
+        }
+
+        function validarConfirmacion() {
+            const clave = document.getElementById('clave').value;
+            const confirmar = document.getElementById('confirmarClave').value;
+            const msg = document.getElementById('confirmarMsg');
+
+            if (!confirmar) {
+                msg.className = 'policy mt-1';
+                msg.textContent = '';
+                return;
+            }
+
+            if (clave === confirmar) {
+                msg.className = 'policy mt-1 text-success';
+                msg.textContent = 'Las contraseñas coinciden.';
+            } else {
+                msg.className = 'policy mt-1 text-danger';
+                msg.textContent = 'Las contraseñas no coinciden.';
+            }
+        }
+    </script>
+
+</body>
+
+</html>

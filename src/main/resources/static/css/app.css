@@ -1,36 +1,40 @@
-/* ── Paleta institucional IDIGER ─────────────────────────────────────────── */
+/* Paleta institucional IDIGER */
 :root {
-    --idiger-primary:   #3D682C;
-    --idiger-hover:     #5FA831;
-    --idiger-dark:      #2d5020;
-    --idiger-light-bg:  #f2f7ee;
-    --idiger-border:    #dde8d5;
-    --idiger-text:      #222;
+    --idiger-primary: #3d682c;
+    --idiger-hover: #5fa831;
+    --idiger-dark: #2d5020;
+    --idiger-light-bg: #f2f7ee;
+    --idiger-border: #dde8d5;
+    --idiger-text: #222;
     --idiger-text-soft: #555;
-    --sidebar-width:    220px;
-    --navbar-height:    54px;
+    --sidebar-width: 220px;
+    --navbar-height: 54px;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
     background: #f5f7f4;
     color: var(--idiger-text);
 }
 
-/* ════════════════════════════════════════════════════════
-   NAVBAR
-════════════════════════════════════════════════════════ */
+/* Navbar */
 .idiger-navbar {
     background: #fff !important;
     height: var(--navbar-height);
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 1040;
     border-bottom: 3px solid var(--idiger-primary);
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
     display: flex;
     align-items: center;
     padding: 0 1rem;
@@ -75,7 +79,7 @@ body {
 .idiger-navbar .dropdown-menu {
     border: 1px solid var(--idiger-border);
     border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
 }
 
 .idiger-navbar .dropdown-item:hover {
@@ -92,9 +96,7 @@ body {
     cursor: pointer;
 }
 
-/* ════════════════════════════════════════════════════════
-   SIDEBAR
-════════════════════════════════════════════════════════ */
+/* Sidebar */
 .idiger-sidebar {
     background: #fff;
     width: var(--sidebar-width);
@@ -110,14 +112,12 @@ body {
     flex-direction: column;
 }
 
-/* Encabezado sidebar */
 .sidebar-header {
     background: var(--idiger-light-bg);
     padding: .85rem 1rem;
     border-bottom: 1px solid var(--idiger-border);
 }
 
-/* Título de sección */
 .sidebar-section-title {
     color: #6a8a5a;
     font-weight: 700;
@@ -128,7 +128,6 @@ body {
     display: block;
 }
 
-/* Links */
 .sidebar-link {
     color: #333 !important;
     font-size: .875rem;
@@ -161,7 +160,6 @@ body {
     padding-left: calc(.75rem - 3px);
 }
 
-/* Footer sidebar */
 .idiger-sidebar > div:last-child {
     margin-top: auto;
     padding: .75rem 1rem;
@@ -170,9 +168,7 @@ body {
     color: #aaa;
 }
 
-/* ════════════════════════════════════════════════════════
-   CONTENIDO PRINCIPAL
-════════════════════════════════════════════════════════ */
+/* Contenido principal */
 .main-content {
     margin-left: var(--sidebar-width);
     margin-top: var(--navbar-height);
@@ -186,25 +182,26 @@ body {
     font-weight: 700;
 }
 
-/* ════════════════════════════════════════════════════════
-   CARDS DE ESTADÍSTICAS
-════════════════════════════════════════════════════════ */
+/* Cards */
 .stat-card {
     border: 1px solid var(--idiger-border);
     border-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
     background: #fff;
     transition: box-shadow .2s;
 }
 
 .stat-card:hover {
-    box-shadow: 0 3px 10px rgba(61,104,44,.12);
+    box-shadow: 0 3px 10px rgba(61, 104, 44, .12);
 }
 
 .stat-icon {
-    width: 48px; height: 48px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.3rem;
 }
 
@@ -212,13 +209,11 @@ body {
     color: var(--idiger-primary);
 }
 
-/* ════════════════════════════════════════════════════════
-   TABLAS
-════════════════════════════════════════════════════════ */
+/* Tablas */
 .table-card {
     border: 1px solid var(--idiger-border);
     border-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
     overflow: hidden;
     background: #fff;
 }
@@ -232,7 +227,9 @@ body {
     padding: .65rem .75rem;
 }
 
-.table tbody tr:hover { background: #f3f8ef; }
+.table tbody tr:hover {
+    background: #f3f8ef;
+}
 
 .table tbody td {
     font-size: .87rem;
@@ -240,9 +237,7 @@ body {
     border-color: #e8f0e2;
 }
 
-/* ════════════════════════════════════════════════════════
-   BADGES
-════════════════════════════════════════════════════════ */
+/* Badges */
 .badge-activo {
     background: #e8f2e0;
     color: var(--idiger-primary);
@@ -263,15 +258,15 @@ body {
     border-radius: 2px;
 }
 
-/* ════════════════════════════════════════════════════════
-   BOTONES — sobreescribir Bootstrap con !important
-════════════════════════════════════════════════════════ */
+/* Botones */
 .btn-primary {
     background-color: var(--idiger-primary) !important;
     border-color: var(--idiger-primary) !important;
     color: #fff !important;
 }
-.btn-primary:hover, .btn-primary:focus {
+
+.btn-primary:hover,
+.btn-primary:focus {
     background-color: var(--idiger-hover) !important;
     border-color: var(--idiger-hover) !important;
 }
@@ -280,6 +275,7 @@ body {
     color: var(--idiger-primary) !important;
     border-color: var(--idiger-primary) !important;
 }
+
 .btn-outline-primary:hover {
     background-color: var(--idiger-primary) !important;
     color: #fff !important;
@@ -290,6 +286,7 @@ body {
     border-color: var(--idiger-hover) !important;
     color: #fff !important;
 }
+
 .btn-success:hover {
     background-color: var(--idiger-primary) !important;
     border-color: var(--idiger-primary) !important;
@@ -299,6 +296,7 @@ body {
     color: var(--idiger-hover) !important;
     border-color: var(--idiger-hover) !important;
 }
+
 .btn-outline-success:hover {
     background-color: var(--idiger-hover) !important;
     color: #fff !important;
@@ -308,33 +306,60 @@ body {
     background-color: var(--idiger-primary) !important;
 }
 
-/* ════════════════════════════════════════════════════════
-   MODALES
-════════════════════════════════════════════════════════ */
+/* Modales y formularios */
 .modal-header.bg-primary {
     background-color: var(--idiger-primary) !important;
 }
+
 .modal-header.bg-success {
     background-color: var(--idiger-hover) !important;
 }
+
 .modal-content {
     border: 1px solid var(--idiger-border);
     border-radius: 4px;
 }
+
 .form-control:focus,
 .form-select:focus {
     border-color: var(--idiger-primary);
-    box-shadow: 0 0 0 3px rgba(61,104,44,.15);
+    box-shadow: 0 0 0 3px rgba(61, 104, 44, .15);
 }
 
-/* ════════════════════════════════════════════════════════
-   RESPONSIVO
-════════════════════════════════════════════════════════ */
+/* Responsivo */
 @media (max-width: 991px) {
     .idiger-sidebar {
         transform: translateX(-100%);
-        box-shadow: 2px 0 8px rgba(0,0,0,.15);
+        box-shadow: 2px 0 8px rgba(0, 0, 0, .15);
     }
-    .idiger-sidebar.show { transform: translateX(0); }
-    .main-content { margin-left: 0; }
+
+    .idiger-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+.role-text {
+    color: #2f4f25;
+    font-size: .84rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.sidebar-logo-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 118px;
+    padding: .45rem .15rem;
+}
+
+.sidebar-logo {
+    max-width: 216px;
+    width: 100%;
+    height: auto;
+    display: block;
 }
